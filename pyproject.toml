@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "tiket-bot"
+version = "0.1.0"
+description = "Телеграм бот для приема заявок в IT отдел"
+authors = ["bazinga <bazinga.mail@yandex.ru>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+python-dotenv = "^0.13.0"
+bitrix24-python3-client = "^0.4.0"
+python-telegram-bot = "^12.7"
+PySocks = "^1.7.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
