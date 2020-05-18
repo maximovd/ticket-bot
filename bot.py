@@ -4,18 +4,22 @@ import logging
 from threading import Thread
 
 from dotenv import load_dotenv
-from telegram import ReplyKeyboardMarkup, ParseMode, ReplyKeyboardRemove
+from telegram import (
+    ReplyKeyboardMarkup,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    ParseMode,
+    ReplyKeyboardRemove,
+)
 from telegram.ext import (
     Updater,
     CommandHandler,
     MessageHandler,
     ConversationHandler,
     Filters,
-    RegexHandler,
     CallbackContext,
+    CallbackQueryHandler,
 )
-
-from utils.handlers import Department
 
 
 logging.basicConfig(
@@ -35,6 +39,8 @@ PROXY = {
         'password': os.environ.get('password'),
     },
 }
+
+NUM = 123
 
 
 def greet_user(update, context: CallbackContext) -> None:
@@ -74,17 +80,58 @@ def ticket_get_name(update, context: CallbackContext) -> str:
         return 'name'
     else:
         context.user_data['tiket_name'] = user_full_name
-        print(Department.get_all())
-        department_choice = [Department.get_all()]
+        departments = [
+                          [
+                              InlineKeyboardButton('Офис', callback_data=NUM),
+                              InlineKeyboardButton('Офис(Одесская)',
+                                                   callback_data=NUM),
+                              InlineKeyboardButton('Игнатова',
+                                                   callback_data=NUM),
+                              InlineKeyboardButton('Казбекская',
+                                                   callback_data=NUM),
+                              InlineKeyboardButton('Котлярова',
+                                                   callback_data=NUM),
+                              InlineKeyboardButton('Красная',
+                                                   callback_data=NUM),
+                              InlineKeyboardButton('Красная площадь',
+                                                   callback_data=NUM),
+                              InlineKeyboardButton('Новороссийск Молодежная',
+                                                   callback_data=NUM),
+                              InlineKeyboardButton('Новороссийск Серебрякова',
+                                                   callback_data=NUM),
+                              InlineKeyboardButton('Мега', callback_data=NUM),
+                              InlineKeyboardButton('Лофт', callback_data=NUM),
+                              InlineKeyboardButton('Покрышкина',
+                                                   callback_data=NUM),
+                              InlineKeyboardButton('СБС', callback_data=NUM),
+                              InlineKeyboardButton('Ставропольская',
+                                                   callback_data=NUM),
+                              InlineKeyboardButton('Туапсе',
+                                                   callback_data=NUM),
+                              InlineKeyboardButton('Тюляева',
+                                                   callback_data=NUM),
+                              InlineKeyboardButton('Чекистов',
+                                                   callback_data=NUM),
+                              InlineKeyboardButton('Российская',
+                                                   callback_data=NUM),
+                          ],
+                      ],
+
+        reply_markup = InlineKeyboardMarkup(departments)
         update.message.reply_text(
-            'Выберите свой подразделение',
-            reply_keyboard=ReplyKeyboardMarkup(
-                keyboard=department_choice,
-                one_time_keyboard=True,
-                resize_keyboard=True,
-            ),
+            'Выберите своё подразделение',
+            reply_keyboard=reply_markup,
         )
         return 'department'
+
+
+def ticket_department(update, context: CallbackContext):
+    query = update.callback_query
+    query.answer()
+
+    context.user_data['department'] = query.data
+    update.message.reply_text('Напишите суть своей проблемы вкратце')
+    return 'trouble_description'
 
 
 def main():
@@ -121,7 +168,13 @@ def main():
                 Filters.text,
                 ticket_get_name,
                 pass_user_data=True,
-            )]
+            )],
+            'department': [CallbackQueryHandler(
+                ticket_department,
+                pattern=f'^({NUM})$',
+                pass_user_data=True,
+            )],
+
         },
         fallbacks=[],
     )

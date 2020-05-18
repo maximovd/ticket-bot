@@ -1,8 +1,9 @@
 import os
-
 from enum import Enum
+
 from dotenv import load_dotenv
 from bitrix24 import Bitrix24
+
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '..', '.env')
 if os.path.exists(dotenv_path):
