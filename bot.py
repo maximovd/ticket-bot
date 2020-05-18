@@ -15,13 +15,16 @@ from telegram.ext import (
     CallbackContext,
 )
 
+from utils.handlers import Department
+
+
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
     level=logging.INFO,
     filename='bot.log',
 )
 
-dotenv_path = os.path.join(os.path.dirname(__file__), '..', '.env')
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 if os.path.exists(dotenv_path):
     load_dotenv(dotenv_path)
 
@@ -38,6 +41,7 @@ def greet_user(update, context: CallbackContext) -> None:
     chat_id = update.effective_chat.id
     create_ticket = ReplyKeyboardMarkup(
         [['Создать заявку']],
+        one_time_keyboard=True,
         resize_keyboard=True,
     )
     context.bot.send_message(chat_id=chat_id,
@@ -55,7 +59,7 @@ def greet_user(update, context: CallbackContext) -> None:
                              )
 
 
-def start_ticket(update, context: CallbackContext, user_data) -> str:
+def start_ticket(update, context: CallbackContext) -> str:
     update.message.reply_text(
         'Пожалуйста введите ваше Имя и Фамилию.',
         reply_makrup=ReplyKeyboardRemove(),
@@ -63,13 +67,24 @@ def start_ticket(update, context: CallbackContext, user_data) -> str:
     return 'name'
 
 
-def ticket_get_name(update, context: CallbackContext, user_data) -> str:
+def ticket_get_name(update, context: CallbackContext) -> str:
     user_full_name = update.message.text
     if len(user_full_name.split(' ')) != 2:
         update.message.reply_text('Пожалуйста введите имя и фамилию')
         return 'name'
     else:
-        user_data['tiket_name'] = user_full_name
+        context.user_data['tiket_name'] = user_full_name
+        print(Department.get_all())
+        department_choice = [Department.get_all()]
+        update.message.reply_text(
+            'Выберите свой подразделение',
+            reply_keyboard=ReplyKeyboardMarkup(
+                keyboard=department_choice,
+                one_time_keyboard=True,
+                resize_keyboard=True,
+            ),
+        )
+        return 'department'
 
 
 def main():
@@ -96,8 +111,8 @@ def main():
     dp.add_handler(CommandHandler('restart', restart))
 
     ticket = ConversationHandler(
-        entry_points=[RegexHandler(
-            '^(Создать заявку)$',
+        entry_points=[MessageHandler(
+            Filters.regex(r'^(Создать заявку)$'),
             start_ticket,
             pass_user_data=True,
         )],
