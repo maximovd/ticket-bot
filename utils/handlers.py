@@ -34,7 +34,7 @@ class Department(Enum):
     KAZBEKSKAYA = ('id', 'Казбекская')
     KOTLYAROVA = ('id', 'Котлярова')
     KRASNAYA = ('id', 'Красная')
-    KP = ('id', 'Красная площадь')
+    KP = ('id', 'Красная-площадь')
     LOFT = ('id', 'Лофт')
     MEGA = ('id', 'Мега')
     NOVOROS_MOLODEJ = ('id', ' Новороссийск Молодежная')
