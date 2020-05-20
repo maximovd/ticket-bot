@@ -19,6 +19,8 @@ from telegram.ext import (
 )
 from telegram.update import Update
 
+from utils.handlers import create_deal
+
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
     level=logging.INFO,
@@ -36,12 +38,13 @@ PROXY = {
         'password': os.environ.get('password'),
     },
 }
+CANCEL = ReplyKeyboardMarkup([['❌Отмена']], resize_keyboard=True)
+START = ReplyKeyboardMarkup([['Начать']], resize_keyboard=True)
 
 
 def greet_user(update: Update, context: CallbackContext) -> None:
-    # chat_id = update.effective_chat.id
     create_ticket = ReplyKeyboardMarkup(
-        [['Создать заявку']],
+        [['Создать заявку📋']],
         resize_keyboard=True,
     )
     update.message.reply_text(
@@ -62,7 +65,7 @@ def greet_user(update: Update, context: CallbackContext) -> None:
 def start_ticket(update: Update, context: CallbackContext) -> str:
     update.message.reply_text(
         'Пожалуйста введите ваше Имя и Фамилию.',
-        reply_markup=ReplyKeyboardRemove(),
+        reply_markup=CANCEL,
     )
     return 'name'
 
@@ -70,7 +73,10 @@ def start_ticket(update: Update, context: CallbackContext) -> str:
 def ticket_get_name(update: Update, context: CallbackContext) -> str:
     user_full_name = update.message.text
     if len(user_full_name.split(' ')) != 2:
-        update.message.reply_text('Введите Имя и Фамилию через пробел.',)
+        update.message.reply_text(
+            'Введите Имя и Фамилию через пробел.',
+            reply_markup=CANCEL,
+        )
         return 'name'
     else:
         context.user_data['full_name'] = user_full_name
@@ -78,24 +84,26 @@ def ticket_get_name(update: Update, context: CallbackContext) -> str:
         context.bot.send_message(
             chat_id=chat_id,
             text='Введите номер своего подразделения:\n'
-                 '1. Офис\n'
-                 '2. Офис(Одесская)\n'
-                 '3. Игнатова\n'
-                 '4. Казбекская\n'
-                 '5. Котлярова\n'
-                 '6. Красная\n'
-                 '7. Красная площадь\n'
-                 '8. Лофт\n'
-                 '9. Мега\n'
-                 '10. Новороссийск Молодежная\n'
-                 '11. Новроссийск Серебрякова\n'
-                 '12. Покрышкина\n'
-                 '13. СБС\n'
-                 '14. Ставропольская\n'
-                 '15. Туапсе\n'
-                 '16. Тюляева\n'
-                 '17. Чекистов\n'
-                 '18. Российская\n',
+                 '1. Колл-Центр\n'
+                 '2. Офис\n'
+                 '3. Офис(Одесская)\n'
+                 '4. Игнатова\n'
+                 '5. Казбекская\n'
+                 '6. Котлярова\n'
+                 '7. Красная\n'
+                 '8. Красная площадь\n'
+                 '9. Лофт\n'
+                 '10. Мега\n'
+                 '11. Новороссийск Молодежная\n'
+                 '12. Новроссийск Серебрякова\n'
+                 '13. Покрышкина\n'
+                 '14. СБС\n'
+                 '15. Ставропольская\n'
+                 '16. Туапсе\n'
+                 '17. Тюляева\n'
+                 '18. Чекистов\n'
+                 '19. Российская\n',
+            reply_markup=CANCEL,
         )
         return 'department'
 
@@ -105,23 +113,24 @@ def ticket_department(update: Update, context: CallbackContext):
     category_id = 0
     department_id = {
         1: 1449,
-        2: 3445,
-        3: 3456,
-        4: 2345,
-        5: 4564,
-        6: 4353,
-        7: 4123,
-        8: 7989,
-        9: 4534,
-        10: 4534,
-        11: 6685,
-        12: 7788,
-        13: 8643,
-        14: 4233,
-        15: 5675,
-        16: 3423,
-        17: 4356,
-        18: 3423,
+        2: 1451,
+        3: 1453,
+        4: 1455,
+        5: 1457,
+        6: 1459,
+        7: 1461,
+        8: 1463,
+        9: 1465,
+        10: 1467,
+        11: 1469,
+        12: 1471,
+        13: 1473,
+        14: 1475,
+        15: 1477,
+        16: 1479,
+        17: 1481,
+        18: 1483,
+        19: 1485,
     }
     for key in department_id.keys():
         if key == answer:
@@ -129,30 +138,34 @@ def ticket_department(update: Update, context: CallbackContext):
 
     if category_id == 0:
         update.message.reply_text(
-            'Номер подразделения неверный, повторите ввод',
+            'Нет такого подразделения, повторите ввод:',
+            reply_markup=CANCEL,
         )
         return 'department'
 
     context.user_data['department'] = category_id
-    update.message.reply_text('Коротко опишите суть своей проблемы:')
+    update.message.reply_text(
+        'Коротко опишите суть своей проблемы:',
+        reply_markup=CANCEL,
+    )
     return 'trouble_description'
 
 
 def ticket_description(update: Update, context: CallbackContext):
     context.user_data['description'] = update.message.text
-    update.message.reply_text('Номер телефона для связи:')
+    update.message.reply_text('Номер телефона для связи:', reply_markup=CANCEL)
     return 'phone_number'
 
 
 def ticket_phone_number(update: Update, context: CallbackContext):
     context.user_data['phone_number'] = update.message.text
-    update.message.reply_text('Почта для связи:')
-    return 'mail'
+    update.message.reply_text('Почта для связи:', reply_markup=CANCEL)
+    return 'email'
 
 
-def ticket_mail(update: Update, context: CallbackContext):
-    context.user_data['mail'] = update.message.text
-    keyboard = [['Да', 'Нет']]
+def ticket_email(update: Update, context: CallbackContext):
+    context.user_data['email'] = update.message.text
+    keyboard = [['✅Да', '❌Нет']]
     markup = ReplyKeyboardMarkup(
         keyboard=keyboard,
         resize_keyboard=True,
@@ -161,10 +174,10 @@ def ticket_mail(update: Update, context: CallbackContext):
     user_text = '''
     *Отправить заявку?*
     Имя и Фамилия: *{full_name}*\n
-    Краткое описание проблемы: *{description}*\n
+    Краткое описание проблемы:\n *{description}*\n
     Номер телефона для связи: *{phone_number}*\n
-    Почта для связи: *{mail}*\n
-    Если все верно, введите *Да*, для введите *Нет*
+    Почта для связи: *{email}*\n
+    Если все верно, нажмите *Да*, для отмены нажмите *Нет*
     '''.format(**context.user_data)
     update.message.reply_text(
         text=user_text,
@@ -176,14 +189,29 @@ def ticket_mail(update: Update, context: CallbackContext):
 
 def ticket_confirmation(update: Update, context: CallbackContext):
     answer = update.message.text
-    if answer == 'Нет':
-        update.message.reply_text('Отмена...')
+    if answer == '❌Нет':
+        update.message.reply_text(
+            'Отмена...',
+            reply_markup=ReplyKeyboardRemove(),
+             )
         return ConversationHandler.END
-    update.message.reply_text(
-        'Спасибо, ваша заявка передана ИТ отделу.\n'
-        'В ближайшее время с вами свяжутся.',
-    )
+    elif answer == '✅Да':
+        create_deal(user_data=context.user_data)
+        update.message.reply_text(
+            'Спасибо, ваша заявка передана ИТ отделу.\n'
+            'В ближайшее время с вами свяжутся.',
+            reply_markup=ReplyKeyboardRemove(),
+        )
+        return ConversationHandler.END
+
+
+def cancel(update: Update, context: CallbackContext):
+    update.message.reply_text('Отмена...', reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END
+
+
+def failure(update: Update, context: CallbackContext):
+    update.message.reply_text('Ошибка, повторите ввод:')
 
 
 def main():
@@ -211,44 +239,85 @@ def main():
 
     ticket = ConversationHandler(
         entry_points=[MessageHandler(
-            Filters.regex('^(Создать заявку)$'),
+            Filters.regex('^(Создать заявку📋)$'),
             start_ticket,
             pass_user_data=True,
         )],
         states={
-            'name': [MessageHandler(
-                Filters.text,
-                ticket_get_name,
-                pass_user_data=True,
-            )],
-            'department': [MessageHandler(
-                Filters.text,
-                ticket_department,
-                pass_user_data=True,
-            )],
-            'trouble_description': [MessageHandler(
-                Filters.text,
-                ticket_description,
-                pass_user_data=True,
-            )],
-            'phone_number': [MessageHandler(
-                Filters.regex(r'^((\+7|7|8)+([0-9]){10})$'),
-                ticket_phone_number,
-                pass_user_data=True,
-            )],
-            'mail': [MessageHandler(
-                Filters.text,
-                ticket_mail,
-                pass_user_data=True,
-            )],
-            'confirmation': [MessageHandler(
-                Filters.regex('^(Да|Нет)$'),
-                ticket_confirmation,
-                pass_user_data=True,
-            )],
-
+            'name': [
+                MessageHandler(
+                    Filters.regex('^(❌Отмена)$'),
+                    cancel,
+                    pass_user_data=True,
+                ),
+                MessageHandler(
+                    Filters.text,
+                    ticket_get_name,
+                    pass_user_data=True,
+                ),
+            ],
+            'department': [
+                MessageHandler(
+                    Filters.regex('^(❌Отмена)$'),
+                    cancel,
+                    pass_user_data=True,
+                ),
+                MessageHandler(
+                    Filters.text,
+                    ticket_department,
+                    pass_user_data=True,
+                ),
+            ],
+            'trouble_description': [
+                MessageHandler(
+                    Filters.regex('^(❌Отмена)$'),
+                    cancel,
+                    pass_user_data=True,
+                ),
+                MessageHandler(
+                    Filters.text,
+                    ticket_description,
+                    pass_user_data=True,
+                ),
+            ],
+            'phone_number': [
+                MessageHandler(
+                    Filters.regex('^(❌Отмена)$'),
+                    cancel,
+                    pass_user_data=True,
+                ),
+                MessageHandler(
+                    Filters.regex(r'^((\+7|7|8)+([0-9]){10})$'),
+                    ticket_phone_number,
+                    pass_user_data=True,
+                ),
+            ],
+            'email': [
+                MessageHandler(
+                    Filters.regex('^(❌Отмена)$'),
+                    cancel,
+                    pass_user_data=True,
+                ),
+                MessageHandler(
+                    Filters.regex(r'^[a-z0-9]+[\._]?'
+                                  r'[a-z0-9]+[@]\w+[.]\w{2,3}$'),
+                    ticket_email,
+                    pass_user_data=True,
+                ),
+            ],
+            'confirmation': [
+                MessageHandler(
+                    Filters.regex('^(✅Да|❌Нет)$'),
+                    ticket_confirmation,
+                    pass_user_data=True,
+                ),
+            ],
         },
-        fallbacks=[],
+        fallbacks=[MessageHandler(
+            Filters.text | Filters.video | Filters.photo | Filters.document,
+            failure,
+            pass_user_data=True,
+        )],
     )
     dp.add_handler(ticket)
 
