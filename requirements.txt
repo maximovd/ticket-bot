@@ -1,0 +1,5 @@
+bitrix24-python3-client==0.4.0
+PySocks==1.7.1
+pytest==5.4.1
+python-dotenv==0.13.0
+python-telegram-bot==12.7
