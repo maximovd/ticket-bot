@@ -1,0 +1,6 @@
+export TELEGRAM_TOKEN="your-telegram-token"
+export proxy_url=""
+export username=""
+export password=""
+export URL="example.bitrix24.ru"
+export TOKEN='your bx24 callback hook token'
