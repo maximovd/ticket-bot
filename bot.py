@@ -194,6 +194,7 @@ def ticket_confirmation(update: Update, context: CallbackContext):
             'Отмена...',
             reply_markup=ReplyKeyboardRemove(),
              )
+        context.user_data.clear()
         return ConversationHandler.END
     elif answer == '✅Да':
         create_deal(user_data=context.user_data)
@@ -202,11 +203,13 @@ def ticket_confirmation(update: Update, context: CallbackContext):
             'В ближайшее время с вами свяжутся.',
             reply_markup=ReplyKeyboardRemove(),
         )
+        context.user_data.clear()
         return ConversationHandler.END
 
 
 def cancel(update: Update, context: CallbackContext):
     update.message.reply_text('Отмена...', reply_markup=ReplyKeyboardRemove())
+    context.user_data.clear()
     return ConversationHandler.END
 
 
