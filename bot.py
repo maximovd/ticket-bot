@@ -103,6 +103,7 @@ def ticket_get_name(update: Update, context: CallbackContext) -> str:
                  '17. Тюляева\n'
                  '18. Чекистов\n'
                  '19. Российская\n',
+                 '20. Сочи\n',
             reply_markup=CANCEL,
         )
         return 'department'
@@ -131,6 +132,7 @@ def ticket_department(update: Update, context: CallbackContext):
         17: 1481,
         18: 1483,
         19: 1485,
+        20: 1487,
     }
     for key in department_id.keys():
         if key == answer:
