@@ -7,11 +7,11 @@ dotenv_path = os.path.join(os.path.dirname(__file__), '..', '.env')
 if os.path.exists(dotenv_path):
     load_dotenv(dotenv_path)
 
-bx24_token = os.environ.get('TOKEN')
-bx24_url = os.environ.get('URL')
+BX24_TOKEN = os.environ.get('TOKEN')
+BX24_URL = os.environ.get('URL')
 
 
-def create_deal(user_data, token=bx24_token, url=bx24_url) -> None:
+def create_deal(user_data, token=BX24_TOKEN, url=BX24_URL) -> None:
     bx24 = Bitrix24(url, user_id=196)
 
     full_name = user_data['full_name']
@@ -32,13 +32,13 @@ def create_deal(user_data, token=bx24_token, url=bx24_url) -> None:
     })
 
 
-def _call_custom_command(token=bx24_token, url=bx24_url):
+def _call_custom_command(token=BX24_TOKEN, url=BX24_URL):
     bx24 = Bitrix24(url, user_id=196)
     result = bx24.call_webhook('crm.contact.fields', token, params={
         'ID': 27
     })
-    print(result)
+    return result
 
 
 if __name__ in '__main__':
-    _call_custom_command()
+    print(_call_custom_command())
